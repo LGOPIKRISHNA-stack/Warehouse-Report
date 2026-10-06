@@ -2824,7 +2824,9 @@ function createPerformanceGraph(rows) {
 
             Number(r.ewayBills) || 0,
 
-            Number(r.maskAdding) || 0
+            Number(r.maskAdding) || 0,
+
+            Number(r.trackScan) || 0
 
         );
 
@@ -2861,6 +2863,9 @@ function createPerformanceGraph(rows) {
         const mask =
             Number(r.maskAdding) || 0;
 
+        const trackScan =
+            Number(r.trackScan) || 0;
+
 
         const scannedHeight =
             Math.max(
@@ -2896,7 +2901,13 @@ function createPerformanceGraph(rows) {
                     : (mask / maxValue) * graphHeight,
                 mask === 0 ? 0 : 4
             );
-
+        const trackScanHeight =
+            Math.max(
+                trackScan === 0
+                    ? 0
+                    : (trackScan / maxValue) * graphHeight,
+                trackScan === 0 ? 0 : 4
+            );
 
         return `
 
@@ -2965,6 +2976,19 @@ function createPerformanceGraph(rows) {
                     >
                         <span>
                             ${mask}
+                        </span>
+                    </div>
+
+                    <!-- TRACK SCAN -->
+
+                    <div
+                        class="graph-bar trackscan-bar"
+                        style="
+                            height:${trackScanHeight}px;
+                        "
+                    >
+                        <span>
+                            ${trackScan}
                         </span>
                     </div>
 
@@ -3050,6 +3074,14 @@ function createPerformanceGraph(rows) {
 
                     Mask
 
+                </div>
+
+                <div class="legend-item">
+                    <span
+                        class="legend-box trackscan-legend"
+                    ></span>
+
+                    Track Scan
                 </div>
 
             </div>
@@ -3179,6 +3211,13 @@ async function employee() {
 
                 </div>
 
+                <div class="card stat">
+                    Track Scan
+                    <b>
+                        ${total('trackScan')}
+                    </b>
+                </div>
+
             </div>
 
 
@@ -3231,6 +3270,10 @@ async function employee() {
                                 </th>
 
                                 <th>
+                                    Track Scan
+                                </th>
+
+                                <th>
                                     Notes
                                 </th>
 
@@ -3248,7 +3291,7 @@ async function employee() {
 
                                     <tr>
 
-                                        <td colspan="6">
+                                        <td colspan="7">
 
                                             No reports available.
 
@@ -3280,6 +3323,10 @@ async function employee() {
 
                                         <td>
                                             ${r.maskAdding}
+                                        </td>
+
+                                        <td>
+                                            ${r.trackScan || 0}
                                         </td>
 
                                         <td>
@@ -3409,6 +3456,19 @@ function addGraphStyles() {
 
         .mask-legend {
             background: #9333ea;
+        }
+
+
+        .trackscan-legend {
+            background: #dc2626;
+        }
+
+        .mask-bar {
+            background: #9333ea;
+        }             
+            
+        .trackscan-bar {
+            background: #dc2626;
         }
 
 
@@ -3938,8 +3998,13 @@ async function admin() {
                             >
 
                         </div>
-
-
+                        <!-- Track Scan -->
+                        <div class="field">
+                        <label>
+                            Track Scan
+                            <input type="number" id="trackScan" value="0" min="0">
+                            </label>                     
+                        </div>
                         <!-- E-WAY -->
 
                         <div class="field">
@@ -4125,6 +4190,9 @@ async function admin() {
                                         Mask
                                     </th>
 
+                                    <th>
+                                        Track Scan
+                                    </th>
                                     <th>
                                         Notes
                                     </th>
@@ -4393,6 +4461,9 @@ async function loadAdminReports() {
                     ${r.maskAdding}
                 </td>
 
+                <td>
+                    ${r.trackScan || 0}
+                </td>
 
                 <td>
                     ${r.notes || '-'}
@@ -4450,7 +4521,7 @@ async function loadAdminReports() {
 
             <tr>
 
-                <td colspan="8">
+                <td colspan="9">
 
                     ${e.message}
 
@@ -4523,6 +4594,8 @@ async function editReport(id) {
     const maskAdding =
         document.getElementById('maskAdding');
 
+    const trackScan =
+        document.getElementById('trackScan');
 
     const notes =
         document.getElementById('notes');
@@ -4576,6 +4649,10 @@ async function editReport(id) {
 
     }
 
+    if (trackScan) {
+        trackScan.value =
+            report.trackScan || 0;
+    }
 
     if (notes) {
 
@@ -4760,7 +4837,10 @@ async function saveReport() {
                     document
                         .getElementById('maskAdding')
                         .value,
-
+                trackScan:
+                    document
+                        .getElementById('trackScan')
+                        .value,                        
                 notes:
                     document
                         .getElementById('notes')
